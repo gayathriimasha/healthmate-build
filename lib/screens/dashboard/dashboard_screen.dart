@@ -15,7 +15,7 @@ import '../goals/goals_screen.dart';
 import '../auth/login_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
-  const DashboardScreen({Key? key}) : super(key: key);
+  const DashboardScreen({super.key});
 
   @override
   State<DashboardScreen> createState() => _DashboardScreenState();
@@ -82,7 +82,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 }
 
 class DashboardHomeScreen extends StatefulWidget {
-  const DashboardHomeScreen({Key? key}) : super(key: key);
+  const DashboardHomeScreen({super.key});
 
   @override
   State<DashboardHomeScreen> createState() => _DashboardHomeScreenState();
@@ -90,7 +90,6 @@ class DashboardHomeScreen extends StatefulWidget {
 
 class _DashboardHomeScreenState extends State<DashboardHomeScreen> {
   // Local state - no provider state management BS
-  List<HealthRecord> _allRecords = [];
   HealthRecord? _todayRecord;
   List<HealthRecord> _weeklyRecords = [];
   bool _hasLoadedData = false;
@@ -110,14 +109,13 @@ class _DashboardHomeScreenState extends State<DashboardHomeScreen> {
       final goalsProvider = Provider.of<GoalsProvider>(context, listen: false);
 
       // Load all data - returns data directly, no notifyListeners
-      final allRecords = await healthProvider.loadRecords();
+      await healthProvider.loadRecords();
       final todayRecord = await healthProvider.loadTodayRecord();
       final weeklyRecords = await healthProvider.getLast7DaysRecords();
       await goalsProvider.loadGoal();
 
       if (mounted) {
         setState(() {
-          _allRecords = allRecords;
           _todayRecord = todayRecord;
           _weeklyRecords = weeklyRecords;
           _hasLoadedData = true;
@@ -129,12 +127,14 @@ class _DashboardHomeScreenState extends State<DashboardHomeScreen> {
         setState(() {
           _isLoading = false;
         });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Failed to load data. Pull to refresh.'),
-            backgroundColor: AppColors.error,
-          ),
-        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Failed to load data. Pull to refresh.'),
+              backgroundColor: AppColors.error,
+            ),
+          );
+        }
       }
     }
   }
@@ -173,7 +173,7 @@ class _DashboardHomeScreenState extends State<DashboardHomeScreen> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(
+                        const Icon(
                           Icons.arrow_downward,
                           size: 64,
                           color: AppColors.textLight,
@@ -199,7 +199,7 @@ class _DashboardHomeScreenState extends State<DashboardHomeScreen> {
             return ListView(
               padding: const EdgeInsets.all(AppSizes.paddingMedium),
               children: [
-                Text(
+                const Text(
                   'Today\'s Activity',
                   style: AppTextStyles.heading2,
                 ),
@@ -239,7 +239,7 @@ class _DashboardHomeScreenState extends State<DashboardHomeScreen> {
                   ],
                 ),
                 const SizedBox(height: 24),
-                Text(
+                const Text(
                   'Goal Progress',
                   style: AppTextStyles.heading2,
                 ),
@@ -260,13 +260,13 @@ class _DashboardHomeScreenState extends State<DashboardHomeScreen> {
                   color: AppColors.waterColor,
                 ),
                 const SizedBox(height: 24),
-                Text(
-                  'Weekly Trends',
+                const Text(
+                  'Visual Insights',
                   style: AppTextStyles.heading2,
                 ),
                 const SizedBox(height: 16),
                 _weeklyRecords.isEmpty
-                    ? Center(
+                    ? const Center(
                         child: Text(
                           'No data available',
                           style: AppTextStyles.body2,
@@ -286,10 +286,22 @@ class _DashboardHomeScreenState extends State<DashboardHomeScreen> {
                             color: AppColors.caloriesColor,
                           ),
                           const SizedBox(height: 12),
-                          WeeklyChart(
-                            records: _weeklyRecords,
-                            dataType: 'water',
+                          WaterWaveVisualization(
+                            currentWater: stats['water'] ?? 0,
+                            goalWater: goalsProvider.dailyWaterGoalMl,
                             color: AppColors.waterColor,
+                          ),
+                          const SizedBox(height: 12),
+                          Consumer<SleepProvider>(
+                            builder: (context, sleepProvider, _) {
+                              final avgHours = sleepProvider.getAverageDuration() / 60;
+                              final avgQuality = sleepProvider.getAverageQuality();
+                              return SleepVisualization(
+                                averageHours: avgHours,
+                                averageQuality: avgQuality,
+                                color: AppColors.sleepColor,
+                              );
+                            },
                           ),
                         ],
                       ),
