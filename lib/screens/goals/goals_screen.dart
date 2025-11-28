@@ -27,14 +27,12 @@ class _GoalsScreenState extends State<GoalsScreen> {
 
     final provider = Provider.of<GoalsProvider>(context, listen: false);
 
-    // Wait if provider is still loading from parent
     if (provider.isLoading) {
       return;
     }
 
     _hasLoadedGoals = true;
 
-    // Use microtask to ensure we're outside any build cycle
     Future.microtask(() {
       if (!mounted) return;
       _stepGoalController.text = provider.dailyStepGoal.toString();
@@ -85,11 +83,10 @@ class _GoalsScreenState extends State<GoalsScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text('Goals & Settings'),
+        title: const Text('Health Goals'),
       ),
       body: Consumer<GoalsProvider>(
         builder: (context, provider, _) {
-          // Load goals after provider finishes loading
           if (!provider.isLoading) {
             _loadGoalsIfNeeded();
           }
@@ -105,146 +102,134 @@ class _GoalsScreenState extends State<GoalsScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(AppSizes.paddingLarge),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.flag,
-                                color: AppColors.primary,
-                              ),
-                              const SizedBox(width: 8),
-                              Text(
-                                'Daily Goals',
-                                style: AppTextStyles.heading2,
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 24),
-                          CustomTextField(
-                            label: 'Daily Step Goal',
-                            hint: 'Enter target steps per day',
-                            controller: _stepGoalController,
-                            keyboardType: TextInputType.number,
-                            inputFormatters: [
-                              FilteringTextInputFormatter.digitsOnly
-                            ],
-                            validator: (value) =>
-                                ValidationHelper.validateNumber(value, 'Step goal'),
-                          ),
-                          const SizedBox(height: 16),
-                          CustomTextField(
-                            label: 'Daily Water Goal (ml)',
-                            hint: 'Enter target water intake in ml',
-                            controller: _waterGoalController,
-                            keyboardType: TextInputType.number,
-                            inputFormatters: [
-                              FilteringTextInputFormatter.digitsOnly
-                            ],
-                            validator: (value) =>
-                                ValidationHelper.validateNumber(value, 'Water goal'),
-                          ),
-                          const SizedBox(height: 16),
-                          CustomTextField(
-                            label: 'Target Weight (kg)',
-                            hint: 'Enter your target weight',
-                            controller: _targetWeightController,
-                            keyboardType: const TextInputType.numberWithOptions(
-                              decimal: true,
-                            ),
-                            validator: (value) =>
-                                ValidationHelper.validateDouble(value, 'Target weight'),
-                          ),
-                          const SizedBox(height: 24),
-                          CustomButton(
-                            text: 'Save Goals',
-                            onPressed: _handleSave,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(AppSizes.paddingLarge),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.info_outline,
-                                color: AppColors.primary,
-                              ),
-                              const SizedBox(width: 8),
-                              Text(
-                                'Current Goals',
-                                style: AppTextStyles.heading3,
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 16),
-                          _buildGoalInfoItem(
-                            'Daily Steps',
-                            '${provider.dailyStepGoal} steps',
-                            Icons.directions_walk,
-                            AppColors.stepsColor,
-                          ),
-                          const SizedBox(height: 12),
-                          _buildGoalInfoItem(
-                            'Daily Water',
-                            '${provider.dailyWaterGoalMl} ml',
-                            Icons.water_drop,
-                            AppColors.waterColor,
-                          ),
-                          const SizedBox(height: 12),
-                          _buildGoalInfoItem(
-                            'Target Weight',
-                            '${provider.targetWeight.toStringAsFixed(1)} kg',
-                            Icons.monitor_weight,
-                            AppColors.secondary,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(AppSizes.paddingLarge),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Recommended Daily Goals',
-                            style: AppTextStyles.heading3,
-                          ),
-                          const SizedBox(height: 16),
-                          _buildRecommendationItem(
-                            'Steps: 10,000 steps/day for general health',
-                          ),
-                          const SizedBox(height: 8),
-                          _buildRecommendationItem(
-                            'Water: 2,000-2,500 ml/day for adults',
-                          ),
-                          const SizedBox(height: 8),
-                          _buildRecommendationItem(
-                            'Weight: Consult BMI calculator for healthy range',
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+                  _buildGoalsCard(),
+                  const SizedBox(height: 20),
+                  _buildCurrentGoalsCard(provider),
+                  const SizedBox(height: 20),
+                  _buildRecommendationsCard(),
                 ],
               ),
             ),
           );
         },
+      ),
+    );
+  }
+
+  Widget _buildGoalsCard() {
+    return Container(
+      padding: const EdgeInsets.all(AppSizes.paddingLarge),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(AppSizes.borderRadius),
+        boxShadow: AppShadows.cardShadow,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.flag,
+                color: AppColors.accent,
+                size: 22,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                'Set Your Goals',
+                style: AppTextStyles.heading3,
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          CustomTextField(
+            label: 'Daily Step Goal',
+            hint: 'Enter target steps per day',
+            controller: _stepGoalController,
+            keyboardType: TextInputType.number,
+            inputFormatters: [
+              FilteringTextInputFormatter.digitsOnly
+            ],
+            validator: (value) =>
+                ValidationHelper.validateNumber(value, 'Step goal'),
+          ),
+          const SizedBox(height: 16),
+          CustomTextField(
+            label: 'Daily Water Goal (ml)',
+            hint: 'Enter target water intake in ml',
+            controller: _waterGoalController,
+            keyboardType: TextInputType.number,
+            inputFormatters: [
+              FilteringTextInputFormatter.digitsOnly
+            ],
+            validator: (value) =>
+                ValidationHelper.validateNumber(value, 'Water goal'),
+          ),
+          const SizedBox(height: 16),
+          CustomTextField(
+            label: 'Target Weight (kg)',
+            hint: 'Enter your target weight',
+            controller: _targetWeightController,
+            keyboardType: const TextInputType.numberWithOptions(
+              decimal: true,
+            ),
+            validator: (value) =>
+                ValidationHelper.validateDouble(value, 'Target weight'),
+          ),
+          const SizedBox(height: 24),
+          CustomButton(
+            text: 'Save Goals',
+            onPressed: _handleSave,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCurrentGoalsCard(GoalsProvider provider) {
+    return Container(
+      padding: const EdgeInsets.all(AppSizes.paddingMedium),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            AppColors.lightBlue,
+            AppColors.pureWhite,
+          ],
+        ),
+        borderRadius: BorderRadius.circular(AppSizes.borderRadius),
+        boxShadow: AppShadows.cardShadow,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Current Goals',
+            style: AppTextStyles.heading3,
+          ),
+          const SizedBox(height: 16),
+          _buildGoalInfoItem(
+            'Daily Steps',
+            '${provider.dailyStepGoal} steps',
+            Icons.directions_walk,
+            AppColors.primaryBlue,
+          ),
+          const SizedBox(height: 12),
+          _buildGoalInfoItem(
+            'Daily Water',
+            '${provider.dailyWaterGoalMl} ml',
+            Icons.water_drop,
+            AppColors.waterColor,
+          ),
+          const SizedBox(height: 12),
+          _buildGoalInfoItem(
+            'Target Weight',
+            '${provider.targetWeight.toStringAsFixed(1)} kg',
+            Icons.monitor_weight,
+            AppColors.accent,
+          ),
+        ],
       ),
     );
   }
@@ -258,12 +243,13 @@ class _GoalsScreenState extends State<GoalsScreen> {
     return Row(
       children: [
         Container(
-          padding: const EdgeInsets.all(8),
+          padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: color.withOpacity(0.1),
+            color: AppColors.pureWhite,
             borderRadius: BorderRadius.circular(8),
+            boxShadow: AppShadows.floatingShadow,
           ),
-          child: Icon(icon, color: color, size: 20),
+          child: Icon(icon, color: color, size: 22),
         ),
         const SizedBox(width: 12),
         Expanded(
@@ -275,6 +261,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
                 value,
                 style: AppTextStyles.body1.copyWith(
                   fontWeight: FontWeight.w600,
+                  color: AppColors.darkerSteel,
                 ),
               ),
             ],
@@ -284,16 +271,61 @@ class _GoalsScreenState extends State<GoalsScreen> {
     );
   }
 
-  Widget _buildRecommendationItem(String text) {
+  Widget _buildRecommendationsCard() {
+    return Container(
+      padding: const EdgeInsets.all(AppSizes.paddingMedium),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(AppSizes.borderRadius),
+        boxShadow: AppShadows.cardShadow,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.lightbulb_outline,
+                color: AppColors.accent,
+                size: 22,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                'Recommended Goals',
+                style: AppTextStyles.heading3,
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          _buildRecommendationItem(
+            'Steps: 10,000 steps/day for general health',
+            Icons.check_circle_outline,
+          ),
+          const SizedBox(height: 10),
+          _buildRecommendationItem(
+            'Water: 2,000-2,500 ml/day for adults',
+            Icons.check_circle_outline,
+          ),
+          const SizedBox(height: 10),
+          _buildRecommendationItem(
+            'Weight: Consult BMI calculator for healthy range',
+            Icons.check_circle_outline,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRecommendationItem(String text, IconData icon) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Icon(
-          Icons.check_circle,
-          size: 16,
-          color: AppColors.success,
+          icon,
+          size: 18,
+          color: AppColors.primary,
         ),
-        const SizedBox(width: 8),
+        const SizedBox(width: 10),
         Expanded(
           child: Text(
             text,

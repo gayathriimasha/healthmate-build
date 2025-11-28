@@ -49,7 +49,12 @@ class _WeeklyChartState extends State<WeeklyChart> with SingleTickerProviderStat
     return AnimatedBuilder(
       animation: _animation,
       builder: (context, child) {
-        return Card(
+        return Container(
+          decoration: BoxDecoration(
+            color: AppColors.surface,
+            borderRadius: BorderRadius.circular(AppSizes.borderRadius),
+            boxShadow: AppShadows.cardShadow,
+          ),
           child: Padding(
             padding: const EdgeInsets.all(AppSizes.paddingMedium),
             child: Column(
@@ -122,8 +127,8 @@ class _WeeklyChartState extends State<WeeklyChart> with SingleTickerProviderStat
         horizontalInterval: null,
         getDrawingHorizontalLine: (value) {
           return FlLine(
-            color: AppColors.border,
-            strokeWidth: 1,
+            color: AppColors.lightGreyBg.withOpacity(0.5),
+            strokeWidth: 0.5,
           );
         },
       ),
@@ -135,7 +140,7 @@ class _WeeklyChartState extends State<WeeklyChart> with SingleTickerProviderStat
             getTitlesWidget: (value, meta) {
               return Text(
                 value.toInt().toString(),
-                style: AppTextStyles.caption,
+                style: AppTextStyles.caption.copyWith(fontSize: 9),
               );
             },
           ),
@@ -150,7 +155,7 @@ class _WeeklyChartState extends State<WeeklyChart> with SingleTickerProviderStat
                   padding: const EdgeInsets.only(top: 8),
                   child: Text(
                     '${date.day}/${date.month}',
-                    style: AppTextStyles.caption,
+                    style: AppTextStyles.caption.copyWith(fontSize: 9),
                   ),
                 );
               }
@@ -247,7 +252,12 @@ class _SleepVisualizationState extends State<SleepVisualization> with SingleTick
     return AnimatedBuilder(
       animation: _animation,
       builder: (context, child) {
-        return Card(
+        return Container(
+          decoration: BoxDecoration(
+            color: AppColors.surface,
+            borderRadius: BorderRadius.circular(AppSizes.borderRadius),
+            boxShadow: AppShadows.cardShadow,
+          ),
           child: Padding(
             padding: const EdgeInsets.all(AppSizes.paddingMedium),
             child: Column(
@@ -428,7 +438,12 @@ class _WaterWaveVisualizationState extends State<WaterWaveVisualization> with Si
     return AnimatedBuilder(
       animation: _animation,
       builder: (context, child) {
-        return Card(
+        return Container(
+          decoration: BoxDecoration(
+            color: AppColors.surface,
+            borderRadius: BorderRadius.circular(AppSizes.borderRadius),
+            boxShadow: AppShadows.cardShadow,
+          ),
           child: Padding(
             padding: const EdgeInsets.all(AppSizes.paddingMedium),
             child: Column(

@@ -18,11 +18,11 @@ class PasswordStrengthIndicator extends StatelessWidget {
       case 1:
         return AppColors.error;
       case 2:
-        return AppColors.warning;
+        return AppColors.accent;
       case 3:
-        return AppColors.secondary;
+        return AppColors.primary;
       case 4:
-        return AppColors.success;
+        return AppColors.primaryBlue;
       default:
         return AppColors.error;
     }

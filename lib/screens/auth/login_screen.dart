@@ -74,7 +74,6 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
     if (!mounted) return;
 
     if (success) {
-      // Show success animation briefly
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Row(
@@ -122,17 +121,17 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.background,
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
             colors: [
-              AppColors.primary,
-              AppColors.primaryLight,
+              AppColors.lightBlue,
               AppColors.background,
             ],
-            stops: const [0.0, 0.4, 1.0],
+            stops: const [0.0, 0.5],
           ),
         ),
         child: SafeArea(
@@ -147,15 +146,10 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      // Logo and branding
                       _buildHeader(),
-                      const SizedBox(height: 48),
-
-                      // Login form card
+                      const SizedBox(height: 40),
                       _buildLoginCard(),
-                      const SizedBox(height: 24),
-
-                      // Sign up link
+                      const SizedBox(height: 20),
                       _buildSignUpLink(),
                     ],
                   ),
@@ -174,37 +168,30 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
         Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.pureWhite,
             shape: BoxShape.circle,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.1),
-                blurRadius: 20,
-                offset: const Offset(0, 10),
-              ),
-            ],
+            boxShadow: AppShadows.elevatedShadow,
           ),
           child: const Icon(
             Icons.favorite,
-            size: 64,
-            color: AppColors.primary,
+            size: 56,
+            color: AppColors.accent,
           ),
         ),
-        const SizedBox(height: 24),
-        const Text(
+        const SizedBox(height: 20),
+        Text(
           'HealthMate',
-          style: TextStyle(
-            fontSize: 36,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-            letterSpacing: 1.2,
+          style: AppTextStyles.heading1.copyWith(
+            fontSize: 32,
+            fontWeight: FontWeight.w600,
+            color: AppColors.darkerSteel,
           ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 6),
         Text(
           'Your personal health companion',
           style: AppTextStyles.body1.copyWith(
-            color: Colors.white.withOpacity(0.9),
+            color: AppColors.textSecondary,
           ),
           textAlign: TextAlign.center,
         ),
@@ -215,15 +202,9 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
   Widget _buildLoginCard() {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(AppSizes.borderRadius * 1.5),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 30,
-            offset: const Offset(0, 15),
-          ),
-        ],
+        color: AppColors.pureWhite,
+        borderRadius: BorderRadius.circular(AppSizes.borderRadius),
+        boxShadow: AppShadows.cardShadow,
       ),
       child: Padding(
         padding: const EdgeInsets.all(AppSizes.paddingLarge),
@@ -236,16 +217,17 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                 'Welcome Back',
                 style: AppTextStyles.heading2.copyWith(
                   fontSize: 24,
+                  fontWeight: FontWeight.w600,
                 ),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 6),
               Text(
                 'Sign in to continue',
                 style: AppTextStyles.body2,
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: 28),
 
               // Email field
               CustomTextField(
@@ -253,7 +235,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                 hint: 'Enter your email',
                 controller: _emailController,
                 keyboardType: TextInputType.emailAddress,
-                prefixIcon: const Icon(Icons.email_outlined),
+                prefixIcon: const Icon(Icons.email_outlined, size: 20),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter your email';
@@ -273,7 +255,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                 hint: 'Enter your password',
                 controller: _passwordController,
                 obscureText: _obscurePassword,
-                prefixIcon: const Icon(Icons.lock_outline),
+                prefixIcon: const Icon(Icons.lock_outline, size: 20),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter your password';
@@ -285,6 +267,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                     _obscurePassword
                         ? Icons.visibility_outlined
                         : Icons.visibility_off_outlined,
+                    size: 20,
                   ),
                   onPressed: () {
                     setState(() {
@@ -295,15 +278,15 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
               ),
               const SizedBox(height: 8),
 
-              // Remember me and Forgot password row
+              // Remember me and Forgot password
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Row(
                     children: [
                       SizedBox(
-                        height: 24,
-                        width: 24,
+                        height: 20,
+                        width: 20,
                         child: Checkbox(
                           value: _rememberMe,
                           onChanged: (value) {
@@ -333,7 +316,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                       'Forgot Password?',
                       style: AppTextStyles.body2.copyWith(
                         color: AppColors.primary,
-                        fontWeight: FontWeight.w600,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
                   ),
@@ -362,7 +345,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.9),
+        color: AppColors.pureWhite.withOpacity(0.7),
         borderRadius: BorderRadius.circular(AppSizes.borderRadius),
       ),
       child: Row(
@@ -394,7 +377,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
               'Sign Up',
               style: AppTextStyles.body1.copyWith(
                 color: AppColors.primary,
-                fontWeight: FontWeight.bold,
+                fontWeight: FontWeight.w600,
               ),
             ),
           ),

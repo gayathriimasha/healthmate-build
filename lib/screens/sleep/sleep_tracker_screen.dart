@@ -32,97 +32,32 @@ class _SleepTrackerScreenState extends State<SleepTrackerScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(AppSizes.paddingLarge),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Add Sleep Session',
-                          style: AppTextStyles.heading2,
-                        ),
-                        const SizedBox(height: 24),
-                        _buildTimePicker(
-                          label: 'Start Time',
-                          time: _startTime,
-                          onSelect: (time) {
-                            setState(() {
-                              _startTime = time;
-                            });
-                          },
-                        ),
-                        const SizedBox(height: 16),
-                        _buildTimePicker(
-                          label: 'End Time',
-                          time: _endTime,
-                          onSelect: (time) {
-                            setState(() {
-                              _endTime = time;
-                            });
-                          },
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          'Sleep Quality',
-                          style: AppTextStyles.body1.copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: List.generate(5, (index) {
-                            final quality = index + 1;
-                            return GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  _quality = quality;
-                                });
-                              },
-                              child: Column(
-                                children: [
-                                  Icon(
-                                    Icons.star,
-                                    size: 32,
-                                    color: quality <= _quality
-                                        ? AppColors.warning
-                                        : AppColors.border,
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    '$quality',
-                                    style: AppTextStyles.caption,
-                                  ),
-                                ],
-                              ),
-                            );
-                          }),
-                        ),
-                        const SizedBox(height: 24),
-                        CustomButton(
-                          text: 'Add Session',
-                          onPressed: _handleAddSession,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 24),
+                _buildAddSessionCard(),
+                const SizedBox(height: 20),
                 _buildStatisticsCard(provider),
-                const SizedBox(height: 24),
+                const SizedBox(height: 20),
                 Text(
                   'Sleep History',
-                  style: AppTextStyles.heading2,
+                  style: AppTextStyles.heading3,
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 12),
                 if (provider.sessions.isEmpty)
                   Center(
                     child: Padding(
                       padding: const EdgeInsets.all(32),
-                      child: Text(
-                        'No sleep sessions yet',
-                        style: AppTextStyles.body2,
+                      child: Column(
+                        children: [
+                          Icon(
+                            Icons.bedtime_outlined,
+                            size: 64,
+                            color: AppColors.mutedBlueGrey,
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            'No sleep sessions yet',
+                            style: AppTextStyles.body2,
+                          ),
+                        ],
                       ),
                     ),
                   )
@@ -144,6 +79,97 @@ class _SleepTrackerScreenState extends State<SleepTrackerScreen> {
     );
   }
 
+  Widget _buildAddSessionCard() {
+    return Container(
+      padding: const EdgeInsets.all(AppSizes.paddingLarge),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(AppSizes.borderRadius),
+        boxShadow: AppShadows.cardShadow,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Add Sleep Session',
+            style: AppTextStyles.heading3,
+          ),
+          const SizedBox(height: 20),
+          _buildTimePicker(
+            label: 'Start Time',
+            time: _startTime,
+            onSelect: (time) {
+              setState(() {
+                _startTime = time;
+              });
+            },
+          ),
+          const SizedBox(height: 16),
+          _buildTimePicker(
+            label: 'End Time',
+            time: _endTime,
+            onSelect: (time) {
+              setState(() {
+                _endTime = time;
+              });
+            },
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'Sleep Quality',
+            style: AppTextStyles.body1.copyWith(
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: List.generate(5, (index) {
+              final quality = index + 1;
+              return GestureDetector(
+                onTap: () {
+                  setState(() {
+                    _quality = quality;
+                  });
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: quality <= _quality
+                        ? AppColors.accent.withOpacity(0.15)
+                        : Colors.transparent,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Column(
+                    children: [
+                      Icon(
+                        Icons.star,
+                        size: 28,
+                        color: quality <= _quality
+                            ? AppColors.accent
+                            : AppColors.lightGreyBg,
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        '$quality',
+                        style: AppTextStyles.caption,
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }),
+          ),
+          const SizedBox(height: 24),
+          CustomButton(
+            text: 'Add Session',
+            onPressed: _handleAddSession,
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildTimePicker({
     required String label,
     required DateTime? time,
@@ -154,7 +180,7 @@ class _SleepTrackerScreenState extends State<SleepTrackerScreen> {
       children: [
         Text(
           label,
-          style: AppTextStyles.body1.copyWith(fontWeight: FontWeight.w600),
+          style: AppTextStyles.body1.copyWith(fontWeight: FontWeight.w500),
         ),
         const SizedBox(height: 8),
         InkWell(
@@ -182,7 +208,7 @@ class _SleepTrackerScreenState extends State<SleepTrackerScreen> {
             }
           },
           child: Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
               color: AppColors.surface,
               borderRadius: BorderRadius.circular(AppSizes.borderRadius),
@@ -190,7 +216,7 @@ class _SleepTrackerScreenState extends State<SleepTrackerScreen> {
             ),
             child: Row(
               children: [
-                Icon(Icons.access_time, color: AppColors.primary),
+                Icon(Icons.access_time, color: AppColors.primary, size: 20),
                 const SizedBox(width: 12),
                 Text(
                   time != null
@@ -207,45 +233,68 @@ class _SleepTrackerScreenState extends State<SleepTrackerScreen> {
   }
 
   Widget _buildStatisticsCard(SleepProvider provider) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(AppSizes.paddingLarge),
-        child: Column(
-          children: [
-            Text(
-              'Sleep Statistics',
-              style: AppTextStyles.heading3,
-            ),
-            const SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                _buildStatItem(
-                  'Avg Duration',
-                  SleepHelper.formatDuration(
-                    provider.getAverageDuration().toInt(),
-                  ),
-                  Icons.bedtime,
-                ),
-                _buildStatItem(
-                  'Avg Quality',
-                  provider.getAverageQuality().toStringAsFixed(1),
-                  Icons.star,
-                ),
-              ],
-            ),
+    return Container(
+      padding: const EdgeInsets.all(AppSizes.paddingLarge),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            AppColors.lightBlue,
+            AppColors.pureWhite,
           ],
         ),
+        borderRadius: BorderRadius.circular(AppSizes.borderRadius),
+        boxShadow: AppShadows.cardShadow,
+      ),
+      child: Column(
+        children: [
+          Text(
+            'Sleep Statistics',
+            style: AppTextStyles.heading3,
+          ),
+          const SizedBox(height: 20),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _buildStatItem(
+                'Avg Duration',
+                SleepHelper.formatDuration(
+                  provider.getAverageDuration().toInt(),
+                ),
+                Icons.bedtime,
+                AppColors.primaryBlue,
+              ),
+              Container(
+                width: 1,
+                height: 60,
+                color: AppColors.lightGreyBg,
+              ),
+              _buildStatItem(
+                'Avg Quality',
+                provider.getAverageQuality().toStringAsFixed(1),
+                Icons.star,
+                AppColors.accent,
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildStatItem(String label, String value, IconData icon) {
+  Widget _buildStatItem(String label, String value, IconData icon, Color color) {
     return Column(
       children: [
-        Icon(icon, color: AppColors.sleepColor, size: 32),
+        Icon(icon, color: color, size: 28),
         const SizedBox(height: 8),
-        Text(value, style: AppTextStyles.heading3),
+        Text(
+          value,
+          style: AppTextStyles.heading3.copyWith(
+            color: color,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
         const SizedBox(height: 4),
         Text(label, style: AppTextStyles.caption),
       ],
@@ -256,52 +305,68 @@ class _SleepTrackerScreenState extends State<SleepTrackerScreen> {
     final startTime = DateTime.fromMillisecondsSinceEpoch(session.startTime);
     final endTime = DateTime.fromMillisecondsSinceEpoch(session.endTime);
 
-    return Card(
+    return Container(
       margin: const EdgeInsets.only(bottom: 12),
-      child: Padding(
-        padding: const EdgeInsets.all(AppSizes.paddingMedium),
-        child: Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    DateHelper.formatDisplayDate(startTime),
-                    style: AppTextStyles.heading3,
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    '${DateHelper.formatTime(startTime)} - ${DateHelper.formatTime(endTime)}',
-                    style: AppTextStyles.body2,
-                  ),
-                  const SizedBox(height: 4),
-                  Row(
-                    children: [
-                      Icon(Icons.timelapse, size: 16, color: AppColors.textSecondary),
-                      const SizedBox(width: 4),
-                      Text(
-                        SleepHelper.formatDuration(session.durationMinutes),
-                        style: AppTextStyles.body2,
-                      ),
-                      const SizedBox(width: 16),
-                      Icon(Icons.star, size: 16, color: AppColors.warning),
-                      const SizedBox(width: 4),
-                      Text(
-                        '${session.quality}/5',
-                        style: AppTextStyles.body2,
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+      padding: const EdgeInsets.all(AppSizes.paddingMedium),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(AppSizes.borderRadius),
+        boxShadow: AppShadows.cardShadow,
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: AppColors.primaryBlue.withOpacity(0.12),
+              borderRadius: BorderRadius.circular(8),
             ),
-            IconButton(
-              icon: const Icon(Icons.delete, color: AppColors.error),
-              onPressed: () => _handleDelete(session.id!, provider),
+            child: Icon(
+              Icons.bedtime,
+              color: AppColors.primaryBlue,
+              size: 24,
             ),
-          ],
-        ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  DateHelper.formatDisplayDate(startTime),
+                  style: AppTextStyles.heading3.copyWith(fontSize: 16),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  '${DateHelper.formatTime(startTime)} - ${DateHelper.formatTime(endTime)}',
+                  style: AppTextStyles.body2,
+                ),
+                const SizedBox(height: 4),
+                Row(
+                  children: [
+                    Icon(Icons.timelapse, size: 14, color: AppColors.textSecondary),
+                    const SizedBox(width: 4),
+                    Text(
+                      SleepHelper.formatDuration(session.durationMinutes),
+                      style: AppTextStyles.caption,
+                    ),
+                    const SizedBox(width: 12),
+                    Icon(Icons.star, size: 14, color: AppColors.accent),
+                    const SizedBox(width: 4),
+                    Text(
+                      '${session.quality}/5',
+                      style: AppTextStyles.caption,
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.delete_outline, color: AppColors.error, size: 20),
+            onPressed: () => _handleDelete(session.id!, provider),
+          ),
+        ],
       ),
     );
   }

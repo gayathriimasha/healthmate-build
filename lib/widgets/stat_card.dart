@@ -49,49 +49,54 @@ class _StatCardState extends State<StatCard> with SingleTickerProviderStateMixin
   Widget build(BuildContext context) {
     return ScaleTransition(
       scale: _scaleAnimation,
-      child: Card(
+      child: Container(
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(AppSizes.borderRadius),
+          boxShadow: AppShadows.cardShadow,
+        ),
         child: InkWell(
           onTap: widget.onTap,
           borderRadius: BorderRadius.circular(AppSizes.borderRadius),
-        child: Padding(
-          padding: const EdgeInsets.all(AppSizes.paddingMedium),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: widget.color.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(8),
+          child: Padding(
+            padding: const EdgeInsets.all(AppSizes.paddingMedium),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: widget.color.withOpacity(0.12),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Icon(widget.icon, color: widget.color, size: 22),
                     ),
-                    child: Icon(widget.icon, color: widget.color, size: 24),
+                    const Spacer(),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Flexible(
+                  child: Text(
+                    widget.value,
+                    style: AppTextStyles.heading2.copyWith(
+                      color: widget.color,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  const Spacer(),
-                ],
-              ),
-              const SizedBox(height: 8),
-              Flexible(
-                child: Text(
-                  widget.value,
-                  style: AppTextStyles.heading2.copyWith(
-                    color: widget.color,
-                    fontWeight: FontWeight.bold,
-                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  widget.title,
+                  style: AppTextStyles.body2,
                   overflow: TextOverflow.ellipsis,
                 ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                widget.title,
-                style: AppTextStyles.body2,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
         ),
       ),
     );
@@ -149,7 +154,12 @@ class _ProgressStatCardState extends State<ProgressStatCard> with SingleTickerPr
     return AnimatedBuilder(
       animation: _progressAnimation,
       builder: (context, child) {
-        return Card(
+        return Container(
+          decoration: BoxDecoration(
+            color: AppColors.surface,
+            borderRadius: BorderRadius.circular(AppSizes.borderRadius),
+            boxShadow: AppShadows.cardShadow,
+          ),
           child: Padding(
             padding: const EdgeInsets.all(AppSizes.paddingMedium),
             child: Column(
@@ -157,7 +167,7 @@ class _ProgressStatCardState extends State<ProgressStatCard> with SingleTickerPr
               children: [
                 Row(
                   children: [
-                    Icon(widget.icon, color: widget.color, size: 24),
+                    Icon(widget.icon, color: widget.color, size: 22),
                     const SizedBox(width: 8),
                     Text(widget.title, style: AppTextStyles.heading3),
                   ],
@@ -167,7 +177,10 @@ class _ProgressStatCardState extends State<ProgressStatCard> with SingleTickerPr
                   children: [
                     Text(
                       '${widget.current}',
-                      style: AppTextStyles.heading2.copyWith(color: widget.color),
+                      style: AppTextStyles.heading2.copyWith(
+                        color: widget.color,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                     Text(
                       ' / ${widget.goal}',
@@ -175,15 +188,17 @@ class _ProgressStatCardState extends State<ProgressStatCard> with SingleTickerPr
                     ),
                   ],
                 ),
-                const SizedBox(height: 8),
-                LinearProgressIndicator(
-                  value: progress * _progressAnimation.value,
-                  backgroundColor: widget.color.withOpacity(0.2),
-                  valueColor: AlwaysStoppedAnimation<Color>(widget.color),
-                  minHeight: 8,
+                const SizedBox(height: 10),
+                ClipRRect(
                   borderRadius: BorderRadius.circular(4),
+                  child: LinearProgressIndicator(
+                    value: progress * _progressAnimation.value,
+                    backgroundColor: widget.color.withOpacity(0.15),
+                    valueColor: AlwaysStoppedAnimation<Color>(widget.color),
+                    minHeight: 6,
+                  ),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 6),
                 Text(
                   '${(progress * 100).toStringAsFixed(0)}% complete',
                   style: AppTextStyles.caption,
