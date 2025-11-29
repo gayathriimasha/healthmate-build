@@ -53,6 +53,10 @@ class _StatCardState extends State<StatCard> with SingleTickerProviderStateMixin
         decoration: BoxDecoration(
           color: AppColors.surface,
           borderRadius: BorderRadius.circular(AppSizes.borderRadius),
+          border: Border.all(
+            color: widget.color,
+            width: 1.5,
+          ),
           boxShadow: AppShadows.cardShadow,
         ),
         child: InkWell(
@@ -69,10 +73,10 @@ class _StatCardState extends State<StatCard> with SingleTickerProviderStateMixin
                     Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: widget.color.withOpacity(0.12),
+                        color: widget.color.withOpacity(0.25),
                         borderRadius: BorderRadius.circular(6),
                       ),
-                      child: Icon(widget.icon, color: widget.color, size: 22),
+                      child: Icon(widget.icon, color: widget.color, size: 24),
                     ),
                     const Spacer(),
                   ],
@@ -83,7 +87,7 @@ class _StatCardState extends State<StatCard> with SingleTickerProviderStateMixin
                     widget.value,
                     style: AppTextStyles.heading2.copyWith(
                       color: widget.color,
-                      fontWeight: FontWeight.w600,
+                      fontWeight: FontWeight.w700,
                     ),
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -91,7 +95,10 @@ class _StatCardState extends State<StatCard> with SingleTickerProviderStateMixin
                 const SizedBox(height: 4),
                 Text(
                   widget.title,
-                  style: AppTextStyles.body2,
+                  style: AppTextStyles.body2.copyWith(
+                    color: AppColors.textSecondary,
+                    fontWeight: FontWeight.w500,
+                  ),
                   overflow: TextOverflow.ellipsis,
                 ),
               ],
