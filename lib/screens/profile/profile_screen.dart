@@ -23,6 +23,8 @@ class ProfileScreen extends StatelessWidget {
             sliver: SliverList(
               delegate: SliverChildListDelegate([
                 const SizedBox(height: 8),
+                _buildGoalsSection(context),
+                const SizedBox(height: 20),
                 _buildStatsCards(context),
                 const SizedBox(height: 20),
                 _buildSettingsSection(context),
@@ -98,6 +100,222 @@ class ProfileScreen extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildGoalsSection(BuildContext context) {
+    final goalsProvider = Provider.of<GoalsProvider>(context);
+
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(AppSizes.borderRadius),
+        boxShadow: AppShadows.cardShadow,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(AppSizes.paddingMedium),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Health Goals',
+                  style: AppTextStyles.heading3,
+                ),
+                Icon(
+                  Icons.flag_outlined,
+                  color: AppColors.primary,
+                  size: 22,
+                ),
+              ],
+            ),
+          ),
+          const Divider(height: 1),
+          _buildGoalTile(
+            context,
+            icon: Icons.directions_walk,
+            title: 'Daily Step Goal',
+            value: '${goalsProvider.dailyStepGoal} steps',
+            color: AppColors.stepsColor,
+            onTap: () => _showEditGoalDialog(
+              context,
+              'Step Goal',
+              'Enter your daily step goal',
+              goalsProvider.dailyStepGoal.toString(),
+              (value) {
+                final intValue = int.tryParse(value);
+                if (intValue != null) {
+                  goalsProvider.updateGoal(
+                    intValue,
+                    goalsProvider.dailyWaterGoalMl,
+                    goalsProvider.targetWeight,
+                  );
+                }
+              },
+              isInt: true,
+            ),
+          ),
+          _buildGoalTile(
+            context,
+            icon: Icons.water_drop,
+            title: 'Daily Water Goal',
+            value: '${goalsProvider.dailyWaterGoalMl} ml',
+            color: AppColors.waterColor,
+            onTap: () => _showEditGoalDialog(
+              context,
+              'Water Goal',
+              'Enter your daily water goal (ml)',
+              goalsProvider.dailyWaterGoalMl.toString(),
+              (value) {
+                final intValue = int.tryParse(value);
+                if (intValue != null) {
+                  goalsProvider.updateGoal(
+                    goalsProvider.dailyStepGoal,
+                    intValue,
+                    goalsProvider.targetWeight,
+                  );
+                }
+              },
+              isInt: true,
+            ),
+          ),
+          _buildGoalTile(
+            context,
+            icon: Icons.monitor_weight,
+            title: 'Target Weight',
+            value: '${goalsProvider.targetWeight.toStringAsFixed(1)} kg',
+            color: AppColors.accent,
+            onTap: () => _showEditGoalDialog(
+              context,
+              'Target Weight',
+              'Enter your target weight (kg)',
+              goalsProvider.targetWeight.toString(),
+              (value) {
+                final doubleValue = double.tryParse(value);
+                if (doubleValue != null) {
+                  goalsProvider.updateGoal(
+                    goalsProvider.dailyStepGoal,
+                    goalsProvider.dailyWaterGoalMl,
+                    doubleValue,
+                  );
+                }
+              },
+              isInt: false,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildGoalTile(
+    BuildContext context, {
+    required IconData icon,
+    required String title,
+    required String value,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSizes.paddingMedium,
+          vertical: 12,
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(icon, color: color, size: 22),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: AppTextStyles.body1,
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    value,
+                    style: AppTextStyles.body2.copyWith(
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              Icons.edit_outlined,
+              color: AppColors.textSecondary,
+              size: 18,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showEditGoalDialog(
+    BuildContext context,
+    String title,
+    String hint,
+    String currentValue,
+    Function(String) onSave,
+    {required bool isInt}
+  ) {
+    final controller = TextEditingController(text: currentValue);
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Edit $title'),
+        content: TextField(
+          controller: controller,
+          keyboardType: TextInputType.numberWithOptions(decimal: !isInt),
+          decoration: InputDecoration(
+            hintText: hint,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(AppSizes.borderRadius),
+            ),
+            filled: true,
+            fillColor: AppColors.background,
+          ),
+          autofocus: true,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () async {
+              final value = controller.text.trim();
+              if (value.isNotEmpty) {
+                onSave(value);
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('$title updated successfully'),
+                    backgroundColor: AppColors.success,
+                    duration: const Duration(seconds: 2),
+                  ),
+                );
+              }
+            },
+            child: const Text('Save'),
+          ),
+        ],
       ),
     );
   }
