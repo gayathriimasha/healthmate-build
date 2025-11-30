@@ -28,10 +28,16 @@ class AppColors {
   static const Color success = primaryBlue;
 
   // Data visualization colors - using palette only
-  static const Color stepsColor = primaryBlue;
-  static const Color caloriesColor = accentOrange;
+  static const Color stepsColor = Color(0xFF1FB731);
+  static const Color caloriesColor = Color(0xFFD9286E);
   static const Color waterColor = Color(0xFF4A9EC1); // More visible blue for water
-  static const Color sleepColor = mutedBlueGrey;
+  static const Color sleepColor = Color(0xFF935BFF);
+
+  // BMI specific colors
+  static const Color bmiUnderweight = Color(0xFF4A9EC1); // Blue
+  static const Color bmiNormal = Color(0xFF1FB731); // Green
+  static const Color bmiOverweight = Color(0xFFFFA726); // Orange
+  static const Color bmiObese = Color(0xFFE53935); // Red
 }
 
 class AppTextStyles {

@@ -55,7 +55,7 @@ class _StatCardState extends State<StatCard> with SingleTickerProviderStateMixin
           borderRadius: BorderRadius.circular(AppSizes.borderRadius),
           border: Border.all(
             color: widget.color,
-            width: 1.5,
+            width: 0.25,
           ),
           boxShadow: AppShadows.cardShadow,
         ),

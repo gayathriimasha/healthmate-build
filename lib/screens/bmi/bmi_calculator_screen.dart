@@ -39,11 +39,7 @@ class _BMICalculatorScreenState extends State<BMICalculatorScreen> {
                   const SizedBox(height: 20),
                   _buildComparisonCards(provider),
                   const SizedBox(height: 16),
-                  _buildCategoryCard(provider),
-                  const SizedBox(height: 16),
                   _buildRecommendationCard(provider),
-                  const SizedBox(height: 20),
-                  _buildBMIRangesCard(),
                 ],
               ],
             ),
@@ -152,117 +148,181 @@ class _BMICalculatorScreenState extends State<BMICalculatorScreen> {
     );
   }
 
-  // Direction 3: Card-Based Comparison
   Widget _buildComparisonCards(BMIProvider provider) {
     final categoryColor = _getBMIColor(provider.category);
+    final bmiValue = provider.bmi;
 
-    return Row(
-      children: [
-        Expanded(
-          child: _buildComparisonCard('18.5', 'Low', AppColors.mutedBlueGrey, false),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: _buildComparisonCard(
-            provider.bmi.toStringAsFixed(1),
-            'YOU',
-            categoryColor,
-            true,
-          ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: _buildComparisonCard('30', 'High', AppColors.accent, false),
-        ),
-      ],
-    );
-  }
+    // BMI ranges
+    const double maxBMI = 40.0; // Max for visualization
 
-  Widget _buildComparisonCard(String value, String label, Color color, bool isHighlighted) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 8),
-      decoration: BoxDecoration(
-        color: isHighlighted ? color.withOpacity(0.15) : AppColors.surface,
-        borderRadius: BorderRadius.circular(AppSizes.borderRadius),
-        boxShadow: isHighlighted ? AppShadows.elevatedShadow : AppShadows.cardShadow,
-        border: isHighlighted ? Border.all(color: color, width: 2) : null,
-      ),
-      child: Column(
-        children: [
-          Text(
-            value,
-            style: AppTextStyles.heading2.copyWith(
-              color: color,
-              fontWeight: FontWeight.w600,
-              fontSize: isHighlighted ? 28 : 20,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: AppTextStyles.caption.copyWith(
-              color: isHighlighted ? color : AppColors.textSecondary,
-              fontWeight: isHighlighted ? FontWeight.w600 : FontWeight.w400,
-            ),
-          ),
-          if (isHighlighted) ...[
-            const SizedBox(height: 8),
-            Icon(Icons.arrow_upward, color: color, size: 16),
-          ],
-        ],
-      ),
-    );
-  }
-
-  Widget _buildCategoryCard(BMIProvider provider) {
-    final categoryColor = _getBMIColor(provider.category);
+    // Calculate position (0-1)
+    double normalizedBMI = (bmiValue.clamp(10, maxBMI) - 10) / (maxBMI - 10);
 
     return Container(
-      padding: const EdgeInsets.all(AppSizes.paddingMedium),
+      padding: const EdgeInsets.all(AppSizes.paddingLarge),
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(AppSizes.borderRadius),
         boxShadow: AppShadows.cardShadow,
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Category: ',
-            style: AppTextStyles.body1,
-          ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            decoration: BoxDecoration(
-              color: categoryColor.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: categoryColor, width: 1.5),
-            ),
-            child: Text(
-              provider.category,
-              style: AppTextStyles.body1.copyWith(
-                color: categoryColor,
-                fontWeight: FontWeight.w600,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Your BMI',
+                style: AppTextStyles.heading3,
               ),
-            ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                decoration: BoxDecoration(
+                  color: categoryColor.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: categoryColor, width: 2),
+                ),
+                child: Text(
+                  provider.bmi.toStringAsFixed(1),
+                  style: AppTextStyles.heading2.copyWith(
+                    color: categoryColor,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          // Progress bar with gradient
+          Stack(
+            children: [
+              // Background gradient bar
+              Container(
+                height: 12,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(6),
+                  gradient: const LinearGradient(
+                    colors: [
+                      AppColors.bmiUnderweight,
+                      AppColors.bmiNormal,
+                      AppColors.bmiOverweight,
+                      AppColors.bmiObese,
+                    ],
+                    stops: [0.0, 0.33, 0.66, 1.0],
+                  ),
+                ),
+              ),
+              // Indicator
+              Positioned(
+                left: MediaQuery.of(context).size.width * normalizedBMI * 0.75,
+                top: -4,
+                child: Container(
+                  width: 20,
+                  height: 20,
+                  decoration: BoxDecoration(
+                    color: categoryColor,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: AppColors.pureWhite, width: 3),
+                    boxShadow: [
+                      BoxShadow(
+                        color: categoryColor.withOpacity(0.5),
+                        blurRadius: 8,
+                        spreadRadius: 2,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          // Labels
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              _buildBMILabel('Underweight', '< 18.5', AppColors.bmiUnderweight),
+              _buildBMILabel('Normal', '18.5-24.9', AppColors.bmiNormal),
+              _buildBMILabel('Overweight', '25-29.9', AppColors.bmiOverweight),
+              _buildBMILabel('Obese', '≥ 30', AppColors.bmiObese),
+            ],
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildBMILabel(String category, String range, Color color) {
+    return Column(
+      children: [
+        Container(
+          width: 8,
+          height: 8,
+          decoration: BoxDecoration(
+            color: color,
+            shape: BoxShape.circle,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          category,
+          style: AppTextStyles.caption.copyWith(
+            fontSize: 10,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        Text(
+          range,
+          style: AppTextStyles.caption.copyWith(
+            fontSize: 9,
+            color: AppColors.textSecondary,
+          ),
+        ),
+      ],
     );
   }
 
   Widget _buildRecommendationCard(BMIProvider provider) {
     final categoryColor = _getBMIColor(provider.category);
 
+    // Get icon and title based on category
+    IconData categoryIcon;
+    String categoryTitle;
+
+    switch (provider.category) {
+      case 'Underweight':
+        categoryIcon = Icons.trending_down;
+        categoryTitle = 'Underweight';
+        break;
+      case 'Normal':
+        categoryIcon = Icons.check_circle;
+        categoryTitle = 'Healthy Weight';
+        break;
+      case 'Overweight':
+        categoryIcon = Icons.warning_amber_rounded;
+        categoryTitle = 'Overweight';
+        break;
+      case 'Obese':
+        categoryIcon = Icons.error;
+        categoryTitle = 'Obese';
+        break;
+      default:
+        categoryIcon = Icons.info;
+        categoryTitle = provider.category;
+    }
+
     return Container(
-      padding: const EdgeInsets.all(AppSizes.paddingMedium),
+      padding: const EdgeInsets.all(AppSizes.paddingLarge),
       decoration: BoxDecoration(
-        color: categoryColor.withOpacity(0.08),
+        color: categoryColor,
         borderRadius: BorderRadius.circular(AppSizes.borderRadius),
-        boxShadow: AppShadows.cardShadow,
-        border: Border(
-          left: BorderSide(color: categoryColor, width: 4),
-        ),
+        boxShadow: [
+          BoxShadow(
+            color: categoryColor.withOpacity(0.4),
+            blurRadius: 16,
+            offset: const Offset(0, 6),
+            spreadRadius: 0,
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -270,33 +330,79 @@ class _BMICalculatorScreenState extends State<BMICalculatorScreen> {
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: categoryColor.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(6),
+                  color: Colors.white.withOpacity(0.3),
+                  borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(
-                  Icons.lightbulb_outline,
-                  color: categoryColor,
-                  size: 20,
+                  categoryIcon,
+                  color: Colors.white,
+                  size: 28,
                 ),
               ),
-              const SizedBox(width: 12),
-              Text(
-                'Recommendation',
-                style: AppTextStyles.heading3.copyWith(
-                  color: categoryColor,
-                  fontWeight: FontWeight.w600,
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Your Status',
+                      style: AppTextStyles.caption.copyWith(
+                        color: Colors.white.withOpacity(0.9),
+                        fontSize: 11,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      categoryTitle,
+                      style: AppTextStyles.heading2.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
-          Text(
-            provider.recommendation,
-            style: AppTextStyles.body1.copyWith(
-              color: AppColors.darkerSteel,
-              height: 1.5,
+          const SizedBox(height: 16),
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(
+                      Icons.lightbulb,
+                      color: categoryColor,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Recommendation',
+                      style: AppTextStyles.heading3.copyWith(
+                        color: categoryColor,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  provider.recommendation,
+                  style: AppTextStyles.body1.copyWith(
+                    color: AppColors.darkerSteel,
+                    height: 1.6,
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -304,64 +410,16 @@ class _BMICalculatorScreenState extends State<BMICalculatorScreen> {
     );
   }
 
-  Widget _buildBMIRangesCard() {
-    return Container(
-      padding: const EdgeInsets.all(AppSizes.paddingMedium),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(AppSizes.borderRadius),
-        boxShadow: AppShadows.cardShadow,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'BMI Categories',
-            style: AppTextStyles.heading3,
-          ),
-          const SizedBox(height: 16),
-          _buildBMIRangeItem('Underweight', '< 18.5', AppColors.mutedBlueGrey),
-          const SizedBox(height: 12),
-          _buildBMIRangeItem('Normal', '18.5 - 24.9', AppColors.primaryBlue),
-          const SizedBox(height: 12),
-          _buildBMIRangeItem('Overweight', '25.0 - 29.9', AppColors.accent),
-          const SizedBox(height: 12),
-          _buildBMIRangeItem('Obese', '≥ 30.0', AppColors.darkerSteel),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildBMIRangeItem(String category, String range, Color color) {
-    return Row(
-      children: [
-        Container(
-          width: 16,
-          height: 16,
-          decoration: BoxDecoration(
-            color: color,
-            shape: BoxShape.circle,
-          ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Text(category, style: AppTextStyles.body1),
-        ),
-        Text(range, style: AppTextStyles.body2),
-      ],
-    );
-  }
-
   Color _getBMIColor(String category) {
     switch (category) {
       case 'Underweight':
-        return AppColors.mutedBlueGrey;
+        return AppColors.bmiUnderweight;
       case 'Normal':
-        return AppColors.primaryBlue;
+        return AppColors.bmiNormal;
       case 'Overweight':
-        return AppColors.accent;
+        return AppColors.bmiOverweight;
       case 'Obese':
-        return AppColors.darkerSteel;
+        return AppColors.bmiObese;
       default:
         return AppColors.textPrimary;
     }
