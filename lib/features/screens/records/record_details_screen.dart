@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../core/constants.dart';
-import '../../core/helpers.dart';
-import '../../models/health_record.dart';
-import '../../providers/health_records_provider.dart';
-import '../../widgets/custom_button.dart';
+import '../../../core/constants.dart';
+import '../../../core/helpers.dart';
+import '../../../models/health_record.dart';
+import '../../../providers/health_records_provider.dart';
+import '../../../widgets/custom_button.dart';
 import 'add_edit_record_screen.dart';
 
 class RecordDetailsScreen extends StatelessWidget {

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../core/constants.dart';
-import '../../providers/bmi_provider.dart';
-import '../../widgets/custom_button.dart';
+import '../../../core/constants.dart';
+import '../../../providers/bmi_provider.dart';
+import '../../../widgets/custom_button.dart';
 
 class BMICalculatorScreen extends StatefulWidget {
   const BMICalculatorScreen({Key? key}) : super(key: key);

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../core/constants.dart';
-import '../../core/helpers.dart';
-import '../../providers/health_records_provider.dart';
-import '../../models/health_record.dart';
+import '../../../core/constants.dart';
+import '../../../core/helpers.dart';
+import '../../../providers/health_records_provider.dart';
+import '../../../models/health_record.dart';
 import 'add_edit_record_screen.dart';
 import 'record_details_screen.dart';
 

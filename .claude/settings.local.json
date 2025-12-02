@@ -6,7 +6,9 @@
       "Bash(git fetch:*)",
       "Bash(git push:*)",
       "Bash(flutter doctor:*)",
-      "Bash(flutter build:*)"
+      "Bash(flutter build:*)",
+      "Bash(rm:*)",
+      "Bash(rmdir:*)"
     ],
     "deny": [],
     "ask": []

@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../core/constants.dart';
-import '../../models/health_record.dart';
-import '../../providers/health_records_provider.dart';
-import '../../providers/goals_provider.dart';
-import '../../providers/sleep_provider.dart';
-import '../../providers/auth_provider.dart';
-import '../../widgets/stat_card.dart';
-import '../../widgets/chart_card.dart';
+import '../../../core/constants.dart';
+import '../../../models/health_record.dart';
+import '../../../providers/health_records_provider.dart';
+import '../../../providers/goals_provider.dart';
+import '../../../providers/sleep_provider.dart';
+import '../../../providers/auth_provider.dart';
+import '../../../widgets/stat_card.dart';
+import '../../../widgets/chart_card.dart';
 import '../profile/profile_screen.dart';
 
 class DashboardHomeScreen extends StatefulWidget {

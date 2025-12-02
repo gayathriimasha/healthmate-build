@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import '../../core/constants.dart';
-import '../../core/helpers.dart';
-import '../../providers/goals_provider.dart';
-import '../../widgets/custom_button.dart';
-import '../../widgets/custom_text_field.dart';
+import '../../../core/constants.dart';
+import '../../../core/helpers.dart';
+import '../../../providers/goals_provider.dart';
+import '../../../widgets/custom_button.dart';
+import '../../../widgets/custom_text_field.dart';
 
 class GoalsScreen extends StatefulWidget {
   const GoalsScreen({Key? key}) : super(key: key);

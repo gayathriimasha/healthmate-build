@@ -6,7 +6,7 @@ import 'providers/health_records_provider.dart';
 import 'providers/sleep_provider.dart';
 import 'providers/goals_provider.dart';
 import 'providers/bmi_provider.dart';
-import 'screens/auth/login_screen.dart';
+import 'features/screens/auth/login_screen.dart';
 
 void main() {
   runApp(const HealthMateApp());
