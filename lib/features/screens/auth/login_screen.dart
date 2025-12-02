@@ -165,19 +165,6 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
   Widget _buildHeader() {
     return Column(
       children: [
-        Container(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: AppColors.pureWhite,
-            shape: BoxShape.circle,
-            boxShadow: AppShadows.elevatedShadow,
-          ),
-          child: const Icon(
-            Icons.favorite,
-            size: 56,
-            color: AppColors.accent,
-          ),
-        ),
         const SizedBox(height: 20),
         Text(
           'HealthMate',

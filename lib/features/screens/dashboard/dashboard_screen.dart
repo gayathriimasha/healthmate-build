@@ -12,7 +12,6 @@ import '../records/records_list_screen.dart';
 import '../sleep/sleep_tracker_screen.dart';
 import '../bmi/bmi_calculator_screen.dart';
 import '../profile/profile_screen.dart';
-import 'dashboard_home_screen_v2.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -74,6 +73,280 @@ class _DashboardScreenState extends State<DashboardScreen> {
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
             label: 'Profile',
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// DashboardHomeScreen moved to separate file for better organization
+// Import the new implementation
+class DashboardHomeScreen extends StatefulWidget {
+  const DashboardHomeScreen({super.key});
+
+  @override
+  State<DashboardHomeScreen> createState() => _DashboardHomeScreenState();
+}
+
+class _DashboardHomeScreenState extends State<DashboardHomeScreen> {
+  // Local state - no provider state management BS
+  HealthRecord? _todayRecord;
+  List<HealthRecord> _weeklyRecords = [];
+  bool _hasLoadedData = false;
+  bool _isLoading = false;
+
+  // No automatic loading - user triggers via refresh
+
+  Future<void> _handleRefresh(BuildContext context) async {
+    if (_isLoading) return;
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final healthProvider = Provider.of<HealthRecordsProvider>(context, listen: false);
+      final goalsProvider = Provider.of<GoalsProvider>(context, listen: false);
+
+      // Load all data - returns data directly, no notifyListeners
+      await healthProvider.loadRecords();
+      final todayRecord = await healthProvider.loadTodayRecord();
+      final weeklyRecords = await healthProvider.getLast7DaysRecords();
+      await goalsProvider.loadGoal();
+
+      if (mounted) {
+        setState(() {
+          _todayRecord = todayRecord;
+          _weeklyRecords = weeklyRecords;
+          _hasLoadedData = true;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Failed to load data. Pull to refresh.'),
+              backgroundColor: AppColors.error,
+            ),
+          );
+        }
+      }
+    }
+  }
+
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppColors.background,
+      appBar: AppBar(
+        title: const Text('Home'),
+        automaticallyImplyLeading: false,
+      ),
+      body: RefreshIndicator(
+        onRefresh: () => _handleRefresh(context),
+        child: Consumer<GoalsProvider>(
+          builder: (context, goalsProvider, _) {
+            // Show empty state if no data loaded yet
+            if (!_hasLoadedData) {
+              return ListView(
+                children: [
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.3),
+                  Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(
+                          Icons.arrow_downward,
+                          size: 64,
+                          color: AppColors.textLight,
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'Pull down to load your health data',
+                          style: AppTextStyles.body1.copyWith(
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              );
+            }
+
+            // Get stats from local state
+            final healthProvider = Provider.of<HealthRecordsProvider>(context, listen: false);
+            final stats = healthProvider.getTodayStats(_todayRecord);
+
+            return ListView(
+              padding: const EdgeInsets.all(AppSizes.paddingMedium),
+              children: [
+                _buildWelcomeArea(context),
+                const SizedBox(height: 24),
+                Text(
+                  'Today\'s Activity',
+                  style: AppTextStyles.heading2,
+                ),
+                const SizedBox(height: 16),
+                GridView.count(
+                  crossAxisCount: 2,
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  crossAxisSpacing: 12,
+                  mainAxisSpacing: 12,
+                  childAspectRatio: 1.2,
+                  children: [
+                    StatCard(
+                      title: 'Steps',
+                      value: '${stats['steps']}',
+                      icon: Icons.directions_walk,
+                      color: AppColors.stepsColor,
+                    ),
+                    StatCard(
+                      title: 'Calories',
+                      value: '${stats['calories']}',
+                      icon: Icons.local_fire_department,
+                      color: AppColors.caloriesColor,
+                    ),
+                    StatCard(
+                      title: 'Water (ml)',
+                      value: '${stats['water']}',
+                      icon: Icons.water_drop,
+                      color: AppColors.waterColor,
+                    ),
+                    StatCard(
+                      title: 'Sleep Quality',
+                      value: _getSleepQuality(context),
+                      icon: Icons.bedtime,
+                      color: AppColors.sleepColor,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 24),
+                const Text(
+                  'Visual Insights',
+                  style: AppTextStyles.heading2,
+                ),
+                const SizedBox(height: 16),
+                _weeklyRecords.isEmpty
+                    ? const Center(
+                        child: Text(
+                          'No data available',
+                          style: AppTextStyles.body2,
+                        ),
+                      )
+                    : Column(
+                        children: [
+                          WeeklyChart(
+                            records: _weeklyRecords,
+                            dataType: 'steps',
+                            color: AppColors.stepsColor,
+                          ),
+                          const SizedBox(height: 12),
+                          WeeklyChart(
+                            records: _weeklyRecords,
+                            dataType: 'calories',
+                            color: AppColors.caloriesColor,
+                          ),
+                          const SizedBox(height: 12),
+                          WaterWaveVisualization(
+                            currentWater: stats['water'] ?? 0,
+                            goalWater: goalsProvider.dailyWaterGoalMl,
+                            color: AppColors.waterColor,
+                          ),
+                          const SizedBox(height: 12),
+                          Consumer<SleepProvider>(
+                            builder: (context, sleepProvider, _) {
+                              final avgHours = sleepProvider.getAverageDuration() / 60;
+                              final avgQuality = sleepProvider.getAverageQuality();
+                              return SleepVisualization(
+                                averageHours: avgHours,
+                                averageQuality: avgQuality,
+                                color: AppColors.sleepColor,
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+              ],
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  String _getSleepQuality(BuildContext context) {
+    final sleepProvider = Provider.of<SleepProvider>(context, listen: false);
+    final avgQuality = sleepProvider.getAverageQuality();
+    return avgQuality > 0 ? avgQuality.toStringAsFixed(1) : 'N/A';
+  }
+
+  Widget _buildWelcomeArea(BuildContext context) {
+    final authProvider = Provider.of<AuthProvider>(context);
+    final userName = authProvider.currentUser?.name ?? 'User';
+    final hour = DateTime.now().hour;
+    String greeting = 'Good Morning';
+    if (hour >= 12 && hour < 17) {
+      greeting = 'Good Afternoon';
+    } else if (hour >= 17) {
+      greeting = 'Good Evening';
+    }
+
+    return Container(
+      padding: const EdgeInsets.all(AppSizes.paddingMedium),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            AppColors.lightBlue,
+            AppColors.pureWhite,
+          ],
+        ),
+        borderRadius: BorderRadius.circular(AppSizes.borderRadius),
+        boxShadow: AppShadows.cardShadow,
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  greeting,
+                  style: AppTextStyles.body2.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  userName,
+                  style: AppTextStyles.heading2.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.darkerSteel,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          CircleAvatar(
+            radius: 24,
+            backgroundColor: AppColors.accent,
+            child: Text(
+              userName.isNotEmpty ? userName[0].toUpperCase() : 'U',
+              style: AppTextStyles.heading3.copyWith(
+                color: AppColors.pureWhite,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
           ),
         ],
       ),
